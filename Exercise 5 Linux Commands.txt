@@ -1,0 +1,2 @@
+sort -n -r numbers.txt | head -n 1 - най-голямото число
+sort -n numbers.txt | head -n 1 - най-малкото число

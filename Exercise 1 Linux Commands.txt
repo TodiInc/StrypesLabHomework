@@ -1,0 +1,40 @@
+Създайте празната директория day1;
+mkdir day1
+
+Създайте празните файлове test1, test2, test3;
+cd day1
+touch test1 test2 test3
+
+Сложете текстовете:
+- "Hello Bash" във файла test1 
+- текущата дата във файла test2
+- името на текущата директория във файла test3
+Това можем да го направим по следните начини;
+1. nano test1 
+   nano test2 
+   nano test3 - и ръчно да напишем текстовете
+2. echo "Hello Bash" > test1 - можем да използваме и ">>" но ако вече имаме друг текст във файла, ще добавим Hello Bash накрая
+   echo "$(date +%d-%m-%Y)" > test2 - можем да използваме и само "$(date)" но така ще запишем и допълнителна информация
+   echo "$PWD" > test3
+
+В директорията day1, създайте директорията testDir. Копирайте в нея файловете test1, test2, test3;
+mkDir testDir
+cp test1 test2 test3 testDir
+
+В директорията testDir, създайте директорията testNested. В нея - копирайте файловете test1, test2;
+cd testDir
+mkdir testNested
+cp test1 test2 testNested
+
+Изтрийте файловете test1,test2,test3 от директорията day1;
+cd ..
+rm test1 test2 test3
+
+В директорията day1 - копирайте цялото съдържание на директорията testDir в новата директория testDirCopy;
+cp -r testDir testDirCopy
+
+Докато се намирате в директорията day1, изтрийте файла test1(от директорията testDir);
+rm testDir/test1
+
+Изтрийте цялото съдържание на директорията testDirCopy;
+rm -r testDirCopy/*
