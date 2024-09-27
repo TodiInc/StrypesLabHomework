@@ -1,0 +1,13 @@
+g++ -E program.cpp -o program.i
+g++ -S program.i -o program.s
+g++ -c program.s -o program.o
+g++ -E swap.cpp -o swap.i
+g++ -S swap.i -o swap.s
+g++ -c swap.s -o swap.o
+g++ program.o swap.o  -o program
+nano program.i
+nano program.s
+ghex program.o
+nano swap.i
+nano swap.s
+ghex swap.o

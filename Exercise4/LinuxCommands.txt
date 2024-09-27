@@ -1,0 +1,3 @@
+echo "23.25 52.7127 16.8233" > numbers.txt
+g++ biggestNumber.cpp -o biggestNumber
+./biggestNumber < numbers.txt

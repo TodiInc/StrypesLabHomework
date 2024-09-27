@@ -1,2 +1,8 @@
+echo "2345234.12361
+1251265.125
+632        
+23727.23423
+1772
+2342356.2" > numbers.txt
 sort -n -r numbers.txt | head -n 1 - най-голямото число
 sort -n numbers.txt | head -n 1 - най-малкото число
