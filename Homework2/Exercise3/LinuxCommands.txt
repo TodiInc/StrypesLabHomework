@@ -1,0 +1,3 @@
+echo -e "0 0\n0 1\n1 0\n1 1" > numbers.txt
+g++ XOR.cpp -o xor
+./xor < numbers.txt
