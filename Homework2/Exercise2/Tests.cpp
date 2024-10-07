@@ -1,72 +1,76 @@
 #include <iostream>
 #include <cmath>
-#include <limits>
+#include <iomanip>
 
-bool compareAbsolute(float a, float b, float epsilon) {
-    return std::fabs(a - b) < epsilon;
+template<typename T>
+bool compareAbsolute(T a, T b, T epsilon) {
+    return fabs(a - b) < epsilon;
 }
 
-bool compareRelative(float a, float b, float epsilon) {
-    return std::fabs(a - b) < epsilon * std::max(std::fabs(a), std::fabs(b));
+template<typename T>
+bool compareRelative(T a, T b, T epsilon) {
+    return fabs(a - b) / fmax(fabs(a), fabs(b)) < epsilon;
 }
 
-bool compareULP(float a, float b, int maxUlps) {
-    int intDiff = *(int*)&a - *(int*)&b;
-    return std::abs(intDiff) <= maxUlps;
+template<typename T>
+bool compareCombined(T a, T b, T epsilon) {
+    return fabs(a - b) < epsilon || fabs(a - b) / fmax(fabs(a), fabs(b)) < epsilon;
 }
 
-template <typename T>
-void runTests(T epsilon) {
-    int correctCount = 0, incorrectCount = 0;
-    T values[] = {1.0f, 1.0000001f, 1.000001f, 1.00001f, 0.9999999f, 0.99999f, -1.0f, -1.00001f, 0.0f, -0.0f};
-    const int numTests = sizeof(values) / sizeof(values[0]);
+template<typename T>
+bool compareULP(T a, T b, int maxUlps) {
+    int intA = *(int*)&a;
+    int intB = *(int*)&b;
+    if (intA < 0) intA = 0x80000000 - intA;
+    if (intB < 0) intB = 0x80000000 - intB;
+    return abs(intA - intB) <= maxUlps;
+}
 
-    for (int i = 0; i < numTests; i++) {
-        for (int j = 0; j < numTests; j++) {
-            bool result = compareAbsolute(values[i], values[j], epsilon);
-            if (i == j && result || i != j && !result){
-                correctCount++;
-            }
-            else incorrectCount++;
-        }
-    }
-    std::cout << "Absolute difference (epsilon = " << epsilon << "): Correct = " << correctCount
-              << ", Incorrect = " << incorrectCount << std::endl;
+void runTests() {
+    const int testCount = 1000000;
+    int correctAbs = 0, correctRel = 0, correctComb = 0, correctULP = 0;
+    float flopat_epsilon = 1e-5;
+    double double_epsilon = 1e-5;
 
-    correctCount = incorrectCount = 0;
-    for (int i = 0; i < numTests; i++) {
-        for (int j = 0; j < numTests; j++) {
-            bool result = compareRelative(values[i], values[j], epsilon);
-            if (i == j && result) correctCount++;
-            else if (i != j && !result) correctCount++;
-            else incorrectCount++;
-        }
-    }
-    std::cout << "Relative difference (epsilon = " << epsilon << "): Correct = " << correctCount
-              << ", Incorrect = " << incorrectCount << std::endl;
+    for (int i = 0; i < testCount; i++) {
+        float a = static_cast<float>(rand()) / static_cast<float>(RAND_MAX); 
+        float b = a + static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * 1e-7;
 
-    int maxUlps = 4;
-    correctCount = incorrectCount = 0;
-    for (int i = 0; i < numTests; i++) {
-        for (int j = 0; j < numTests; j++) {
-            bool result = compareULP(values[i], values[j], maxUlps);
-            if (i == j && result) correctCount++;
-            else if (i != j && !result) correctCount++;
-            else incorrectCount++;
-        }
+        if (compareAbsolute(a, b, flopat_epsilon)) correctAbs++;
+        if (compareRelative(a, b, flopat_epsilon)) correctRel++;
+        if (compareCombined(a, b, flopat_epsilon)) correctComb++;
+        if (compareULP(a, b, 4)) correctULP++;
     }
-    std::cout << "ULP comparing (maxUlps = " << maxUlps << "): Correct = " << correctCount
-              << ", Incorrect = " << incorrectCount << std::endl;
+
+    std::cout << "Float tests:\n";
+    std::cout << "Absolute comparing: " << correctAbs << " correct compares of " << testCount << std::endl;
+    std::cout << "Relative comparing: " << correctRel << " correct compares of " << testCount << std::endl;
+    std::cout << "Combined comparing: " << correctComb << " correct compares of " << testCount << std::endl;
+    std::cout << "ULP comparing: " << correctULP << " correct compares of " << testCount << std::endl;
+
+    correctAbs = 0, correctRel = 0, correctComb = 0, correctULP = 0;
+
+    for (int i = 0; i < testCount; i++) {
+        double a = static_cast<double>(rand()) / static_cast<double>(RAND_MAX);
+        double b = a + static_cast<double>(rand()) / static_cast<double>(RAND_MAX) * 1e-9;
+
+        if (compareAbsolute(a, b, double_epsilon)) correctAbs++;
+        if (compareRelative(a, b, double_epsilon)) correctRel++;
+        if (compareCombined(a, b, double_epsilon)) correctComb++;
+        if (compareULP(*(float*)&a, *(float*)&b, 4)) correctULP++;
+    }
+
+    std::cout << std::endl;
+    std::cout << "Double tests:\n";
+    std::cout << "Absolute comparing: " << correctAbs << " correct compares of " << testCount << std::endl;
+    std::cout << "Relative comparing: " << correctRel << " correct compares of " << testCount << std::endl;
+    std::cout << "Combined comparing: " << correctComb << " correct compares of " << testCount << std::endl;
+    std::cout << "ULP comparing: " << correctULP << " correct compares of " << testCount << std::endl;
 }
 
 int main() {
-    std::cout << "Float tests:\n";
-    runTests<float>(1e-6f);
-    runTests<float>(1e-5f);
 
-    std::cout << "\n Double tests:\n";
-    runTests<double>(1e-10);
-    runTests<double>(1e-9);
+    runTests();
 
     return 0;
 }
