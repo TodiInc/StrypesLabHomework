@@ -1,7 +1,6 @@
 #include <iostream>
 #include <cstdint>
-
-const int TOTAL_STUDENTS = 64;
+#include <bitset>
 
 void showMenu() {
     std::cout << "\nMENU:\n";
@@ -10,6 +9,7 @@ void showMenu() {
     std::cout << "3. Show absent students\n";
     std::cout << "4. Show present students\n";
     std::cout << "5. Toggle student status\n";
+    std::cout << "6. Show Mask\n";
     std::cout << "0. Exit\n";
     std::cout << "Choose an option: ";
 }
@@ -20,10 +20,11 @@ void addPresence(uint64_t &attendanceMask){
     std::cout<<"Choose student: ";
     std::cin>>student;
     while(student < 1 || student > 64){
-        std::cout<<"No such student number!";
+        std::cout<<"No such student number! Try again: ";
         std::cin>>student;
     }
-    attendanceMask |=(1<<student);
+    attendanceMask = attendanceMask | (1ULL<<(student-1));
+    std::cout<<"Mask: "<<std::bitset<64>(attendanceMask)<<std::endl;
 }
 
 void removePresence(uint64_t &attendanceMask){
@@ -32,10 +33,11 @@ void removePresence(uint64_t &attendanceMask){
     std::cout<<"Choose student: ";
     std::cin>>student;
     while(student < 1 || student > 64){
-        std::cout<<"No such student number!";
+        std::cout<<"No such student number! Try again: ";
         std::cin>>student;
     }
-    attendanceMask &=~(1<<student);
+    attendanceMask = attendanceMask & ( ~ (1ULL<<(student-1)));
+    std::cout<<"Mask: "<<std::bitset<64>(attendanceMask)<<std::endl;
 }
 
 void showAbsentStudents(uint64_t &attendanceMask){
@@ -44,11 +46,12 @@ void showAbsentStudents(uint64_t &attendanceMask){
     std::cout<<"Absent students: ";
     for (int i = 0; i < 64; i++)
     {
-        if(!((attendanceMask&(1<<i))>>i)){
+        if(!((attendanceMask & (1ULL<<i))>>i)){
             std::cout<<i+1<<" ";
             flag = false;
         }
     }
+    std::cout << std::endl;
     if(flag){
         std::cout<<" None.";
     }
@@ -60,11 +63,12 @@ void showPresentStudents(uint64_t &attendanceMask){
     std::cout<<"Present students: ";
     for (int i = 0; i < 64; i++)
     {
-        if(((attendanceMask&(1<<i))>>i)){
+        if((attendanceMask&(1ULL<<i))>>i){
             std::cout<<i+1<<" ";
             flag = false;
         }
     }
+    std::cout << std::endl;
     if(flag){
         std::cout<<" None.";
     }
@@ -76,10 +80,11 @@ void toggleStudentStatus(uint64_t &attendanceMask){
     std::cout<<"Choose student: ";
     std::cin>>student;
     while(student < 1 || student > 64){
-        std::cout<<"No such student number!";
+        std::cout<<"No such student number! Try again: ";
         std::cin>>student;
     }
-    attendanceMask ^=(1<<student);
+    attendanceMask = attendanceMask ^ (1ULL<<(student-1));
+    std::cout<<"Mask: "<<std::bitset<64>(attendanceMask)<<std::endl;
 }
 
 int main() {
@@ -105,6 +110,9 @@ int main() {
                 break;
             case 5:
                 toggleStudentStatus(attendanceMask);
+                break;
+            case 6:
+                std::cout<<"Mask: "<<std::bitset<64>(attendanceMask)<<std::endl;
                 break;
             case 0:
                 std::cout << "Exiting...\n";
