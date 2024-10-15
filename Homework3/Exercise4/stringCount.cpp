@@ -1,24 +1,22 @@
 #include <iostream>
 #include <string>
+#include <iomanip>
 
 int main (int argc, char *argv[])
 {
     int count = 1;
 
-    std::string str = argv[1];
-    std::cout<<"Str = "<<argv[1]<<std::endl;
-    std::string compareString;
+    std::string str = argv[1], compareString;
 
-    while(getchar()!=EOF){
-        std::cin>>compareString;
-        std::cout<<"compareString = "<<compareString<<std::endl;
+    while(!std::cin.eof()){
+        getline(std::cin,compareString);
         if(str == compareString){
             count++;
         }
     }
 
-    std::cout<<"Count: "<<count<<std::endl;
+    std::cout<<"Count = "<<count<<std::endl;
     
 }
 
-//защо трябва да броим и самия str?
+//Защо трябва да броим с едно повече (от примера към задачата)?

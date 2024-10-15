@@ -12,15 +12,44 @@ void showMenu() {
     std::cout << "Choose an option: ";
 }
 
+void checkInput(int &number)
+{
+    bool shouldLoop = true;
+    do
+    {
+        std::string input;
+
+        getline(std::cin,input);
+        try
+        {
+            size_t idx;
+            number = std::stod(input, &idx);
+
+            if (idx != input.length()) {
+                std::cerr<<"Invalid input. Try again: ";
+            }else{
+                shouldLoop = false;
+            }
+        }
+        catch(const std::exception& e)
+        {
+            std::cerr<<"Invalid input. Try again: ";
+        }
+
+    } while (shouldLoop);
+    
+}
+
 void addPresence(uint64_t &attendanceMask){
 
     int student;
     std::cout<<"Choose student: ";
-    std::cin>>student;
+
+    checkInput(student);
 
     while(student < 1 || student > 64){
         std::cerr<<"No such student number! Try again: ";
-        std::cin>>student;
+        checkInput(student);
     }
     attendanceMask = attendanceMask | (1ULL<<(student-1));
 }
@@ -29,11 +58,11 @@ void removePresence(uint64_t &attendanceMask){
 
     int student;
     std::cout<<"Choose student: ";
-    std::cin>>student;
+    checkInput(student);
 
     while(student < 1 || student > 64){
         std::cerr<<"No such student number! Try again: ";
-        std::cin>>student;
+        checkInput(student);
     }
     attendanceMask = attendanceMask & ( ~ (1ULL<<(student-1)));
 }
@@ -76,11 +105,11 @@ void toggleStudentStatus(uint64_t &attendanceMask){
 
     int student;
     std::cout<<"Choose student: ";
-    std::cin>>student;
+    checkInput(student);
 
     while(student < 1 || student > 64){
         std::cerr<<"No such student number! Try again: ";
-        std::cin>>student;
+        checkInput(student);
     }
     attendanceMask = attendanceMask ^ (1ULL<<(student-1));
 }
@@ -92,7 +121,7 @@ int main() {
     do {
         showMenu();
 
-        std::cin >> option;
+        checkInput(option);
 
         switch (option) {
         case 1:
@@ -114,7 +143,7 @@ int main() {
             std::cout << "Exited\n";
             break;
         default:
-            std::cerr<<"Invalid input. Try again : ";
+            std::cerr<<"Invalid option.";
             break;
         }
         
